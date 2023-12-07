@@ -13,7 +13,7 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using ContactManagerStarter.Models;
 
-namespace ContactManager.Controllers
+namespace ContactManager.Controllers // Added ILogger and error handling to all methods.
 {
     public class ContactsController : Controller
     {
@@ -142,7 +142,7 @@ namespace ContactManager.Controllers
                 _context.EmailAddresses.RemoveRange(contact.EmailAddresses);
                 _context.Addresses.RemoveRange(contact.Addresses);
 
-
+                // Sets the first email as primary email as default.
                 for (int i = 0; i < model.Emails.Count; i++)
                 {
                     EmailAddress address = new EmailAddress
@@ -214,6 +214,7 @@ namespace ContactManager.Controllers
             }
         }
 
+        // This method was added to update the primary email.
         [HttpPost]
         public async Task<IActionResult> UpdatePrimaryEmail([FromBody] UpdatePrimaryEmailModel model)
         {

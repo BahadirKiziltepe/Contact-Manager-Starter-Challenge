@@ -22,13 +22,13 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
                         opts => opts.CommandTimeout(600)));
 
 builder.Services.AddSignalR();
-builder.Services.AddElmah(options =>
+builder.Services.AddElmah(options => // Elmah added.
 {
     options.Path = "/elmah";
     options.ConnectionString = "ContactDb";
 });
 
-builder.Logging.ClearProviders();
+builder.Logging.ClearProviders(); // ILogger added.
 builder.Logging.AddConsole();
 
 var app = builder.Build();

@@ -105,6 +105,7 @@ $(function () {
         $(this).parent().remove();
     });
 
+    // This JavaScript function is designed for updating the primary email status within a list.
     $(document).on("click", "#emailList .emailListItem .setPrimary", function () {
         let emailListItem = $(this).closest(".emailListItem");
         let email = emailListItem.data("email");
