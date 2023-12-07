@@ -35,7 +35,8 @@ namespace ContactManager.Data
                     Title = "Mr.",
                     FirstName = "Bill",
                     LastName = "Gates",
-                    DOB = new DateTime(1960, 05, 01)
+                    DOB = new DateTime(1960, 05, 01),
+                    PrimaryEmail = "Bill@gates.com"
                 };
 
             var steve =
@@ -45,8 +46,9 @@ namespace ContactManager.Data
                     Title = "Mr.",
                     FirstName = "Steve",
                     LastName = "Jobs",
-                    DOB = new DateTime(1950, 09, 21)
-                };
+                    DOB = new DateTime(1950, 09, 21),
+                    PrimaryEmail = "Steve@Jobs.com"
+				};
 
             var sundar =
                 new Contact
@@ -55,7 +57,8 @@ namespace ContactManager.Data
                     Title = "Mr.",
                     FirstName = "Sundar",
                     LastName = "Pichai",
-                    DOB = new DateTime(1980, 01, 11)
+                    DOB = new DateTime(1980, 01, 11),
+                    PrimaryEmail = "SundarPichai@gmail.com"
                 };
 
 

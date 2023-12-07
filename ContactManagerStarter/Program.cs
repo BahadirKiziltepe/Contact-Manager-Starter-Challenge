@@ -3,6 +3,8 @@ using ContactManager.Hubs;
 using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
+using Microsoft.Extensions.Logging;
+using ElmahCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +22,18 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
                         opts => opts.CommandTimeout(600)));
 
 builder.Services.AddSignalR();
+builder.Services.AddElmah(options =>
+{
+    options.Path = "/elmah";
+    options.ConnectionString = "ContactDb";
+});
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 var app = builder.Build();
+
+app.UseElmah();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

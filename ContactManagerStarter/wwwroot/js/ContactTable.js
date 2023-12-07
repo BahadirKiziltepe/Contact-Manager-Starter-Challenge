@@ -42,13 +42,13 @@ $(function () {
         }
 
         if (validateEmail(emailAddress)) {
-                  $("#emailList").append(
-            '<li class="list-group-item emailListItem" data-email="' + emailAddress + '" data-type="' + emailAddressType + '">' +
-            '<span class="badge ' + emailTypeClass + ' m-l-10">' + emailAddressType + '</span>' +
-            '<span class="m-l-20">' + emailAddress + ' </span>' +
-            '<a class="redText pointer float-right removeEmail" title="Delete Email">X</a>' +
-            '</li>');
-            $('#newEmailAddress').val("");  
+            $("#emailList").append(
+                '<li class="list-group-item emailListItem" data-email="' + emailAddress + '" data-type="' + emailAddressType + '">' +
+                '<span class="badge ' + emailTypeClass + ' m-l-10">' + emailAddressType + '</span>' +
+                '<span class="m-l-20">' + emailAddress + ' </span>' +
+                '<a class="redText pointer float-right removeEmail" title="Delete Email">X</a>' +
+                '</li>');
+            $('#newEmailAddress').val("");
             $('#newEmailAddress').removeClass("invalidInput");
             $('#invalidEmailFeedback').hide();
         } else {
@@ -80,23 +80,23 @@ $(function () {
         }
 
         //if (validateAddress(address)) {
-            $("#addressList").append(
-                '<li class="list-group-item addressListItem" data-street1="' + street1 + '" data-street2="' + street2 + '" data-city="' +
-                city + '" data-state="' + state + '" data-zip="' + zip + '" data-type="' + addressType + '">' +
-                '<span class="badge ' + addressTypeClass + ' m-l-10">' + addressType + '</span>' +
-                '<span class="m-l-20">' + address + ' </span>' +
-                '<a class="redText pointer float-right removeAddress" title="Delete Address">X</a>' +
-                '</li>');
+        $("#addressList").append(
+            '<li class="list-group-item addressListItem" data-street1="' + street1 + '" data-street2="' + street2 + '" data-city="' +
+            city + '" data-state="' + state + '" data-zip="' + zip + '" data-type="' + addressType + '">' +
+            '<span class="badge ' + addressTypeClass + ' m-l-10">' + addressType + '</span>' +
+            '<span class="m-l-20">' + address + ' </span>' +
+            '<a class="redText pointer float-right removeAddress" title="Delete Address">X</a>' +
+            '</li>');
 
-            $('#newAddressStreet1').val("");
-            $('#newAddressStreet2').val("");
-            $('#newAddressCity').val("");
-            $('#newAddressState').val("");
-            $('#newAddressZip').val("");
+        $('#newAddressStreet1').val("");
+        $('#newAddressStreet2').val("");
+        $('#newAddressCity').val("");
+        $('#newAddressState').val("");
+        $('#newAddressZip').val("");
 
-            //$('.addressInput').removeClass("invalidInput");
+        //$('.addressInput').removeClass("invalidInput");
 
-            //$('.addressFeedback').hide();
+        //$('.addressFeedback').hide();
         //} 
     });
 
@@ -106,6 +106,32 @@ $(function () {
 
     $(document).on("click", ".removeAddress", function () {
         $(this).parent().remove();
+    });
+
+    $(document).on("click", "#emailList .emailListItem", function () {
+        let email = $(this).data("email");
+        let contactId = $("#contactId").val();
+
+        $.ajax({
+            type: "POST",
+            url: "/Contacts/UpdatePrimaryEmail",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({ contactId: contactId, email: email }),
+            success: function () {
+                $("#emailList .emailListItem").each(function () {
+                    let currentEmail = $(this).data("email");
+                    let primaryIndicator = $(this).find(".primary-indicator");
+                    if (currentEmail === email) {
+                        primaryIndicator.html('<span class="badge badge-success">Yes</span>').addClass("badge badge-success");
+                    } else {
+                        primaryIndicator.html('<span>No</span>').removeClass("badge badge-success");
+                    }
+                });
+            },
+            error: function () {
+                // Handle error
+            }
+        });
     });
 
     $(document).on("click", "#saveContactButton", function () {
@@ -136,6 +162,7 @@ $(function () {
             $('.invalidMessage').hide();
             $('.form-control').removeClass("invalidInput");
 
+            //name
             if (data.FirstName == "") {
                 $('#editContactFirstName').addClass("invalidInput");
                 $('#invalidFirstNameFeedback').show();
@@ -144,6 +171,35 @@ $(function () {
             if (data.LastName == "") {
                 $('#editContactLastName').addClass("invalidInput");
                 $('#invalidLastNameFeedback').show();
+                isValid = false;
+            }
+
+            //email
+            if (data.NewEmail != "") {
+                $('#newEmailAddress').addClass("invalidInput");
+                $('#invalidEmailFeedback').show();
+                isValid = false;
+            }
+
+            //address
+            if (data.NewStreet != "") {
+                $('#newAddressStreet1').addClass("invalidInput");
+                $('#invalidAddressStreet1Feedback').show();
+                isValid = false;
+            }
+            if (data.NewCity != "") {
+                $('#newAddressCity').addClass("invalidInput");
+                $('#invalidAddressCityFeedback').show();
+                isValid = false;
+            }
+            if (data.NewState != "") {
+                $('#newAddressState').addClass("invalidInput");
+                $('#invalidAddressStateFeedback').show();
+                isValid = false;
+            }
+            if (data.NewZip != "") {
+                $('#newAddressZip').addClass("invalidInput");
+                $('#invalidAddressZipFeedback').show();
                 isValid = false;
             }
 
@@ -156,17 +212,33 @@ $(function () {
             FirstName: $("#editContactFirstName").val(),
             LastName: $("#editContactLastName").val(),
             DOB: $("#editContactDOB").val(),
+            PrimaryEmail: $("#primaryEmailInput").val(),
+            NewEmail: $("#newEmailAddress").val(),
+            NewStreet: $("#newAddressStreet1").val(),
+            NewCity: $("#newAddressCity").val(),
+            NewState: $("#newAddressState").val(),
+            NewZip: $("#newAddressZip").val(),
             Emails: getEmailAddresses(),
             Addresses: getAddresses()
         };
 
+        let dataToCreate = {
+            ContactId: $("#contactId").val() || "00000000-0000-0000-0000-000000000000",
+            Title: $("#editContactTitle").val(),
+            FirstName: $("#editContactFirstName").val(),
+            LastName: $("#editContactLastName").val(),
+            DOB: $("#editContactDOB").val(),
+            PrimaryEmail: $("#primaryEmailInput").val(),
+            Emails: getEmailAddresses(),
+            Addresses: getAddresses()
+        };
 
         if (validateInputs(data)) {
             $.ajax({
                 type: "POST",
                 url: "/Contacts/SaveContact",
                 contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(data),
+                data: JSON.stringify(dataToCreate),
                 datatype: "json",
                 success: function () {
                     $('#modal-editContact').modal('hide');
@@ -178,6 +250,9 @@ $(function () {
                     $("#ServerErrorAlert").show();
                 }
             });
+        }
+        else {
+            return false;
         }
     });
 
@@ -214,7 +289,7 @@ $(function () {
             }
         });
     });
- 
+
     function loadContactTable() {
         $.ajax({
             type: "GET",
