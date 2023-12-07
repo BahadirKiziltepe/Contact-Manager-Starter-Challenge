@@ -33,29 +33,26 @@ $(function () {
     $(document).on("click", "#addNewEmail", function () {
         let emailAddress = $('#newEmailAddress').val();
         let emailAddressType = $('#newEmailAddressType').val();
-        let emailTypeClass;
-
-        if (emailAddressType === "Personal") {
-            emailTypeClass = "badge-primary"; //blue badge
-        } else {
-            emailTypeClass = "badge-success"; //green badge
-        }
+        let emailTypeClass = emailAddressType === "Personal" ? "badge-primary" : "badge-success";
+        let emailTypeBadge = '<span class="badge ' + emailTypeClass + ' m-l-10">' + emailAddressType + '</span>';
 
         if (validateEmail(emailAddress)) {
-            $("#emailList").append(
-                '<li class="list-group-item emailListItem" data-email="' + emailAddress + '" data-type="' + emailAddressType + '">' +
-                '<span class="badge ' + emailTypeClass + ' m-l-10">' + emailAddressType + '</span>' +
-                '<span class="m-l-20">' + emailAddress + ' </span>' +
+            let newListItem = '<li class="list-group-item emailListItem" data-email="' + emailAddress + '" data-type="' + emailAddressType + '">' +
+                emailTypeBadge +
+                '<a class="pointer setPrimary primary-indicator m-l-10">Set Primary</a>' +
+                '<span class="m-l-20">' + emailAddress + '</span>' +
                 '<a class="redText pointer float-right removeEmail" title="Delete Email">X</a>' +
-                '</li>');
-            $('#newEmailAddress').val("");
-            $('#newEmailAddress').removeClass("invalidInput");
+                '</li>';
+
+            $("#emailList").append(newListItem);
+            $('#newEmailAddress').val("").removeClass("invalidInput");
             $('#invalidEmailFeedback').hide();
         } else {
             $('#newEmailAddress').addClass("invalidInput");
             $('#invalidEmailFeedback').show();
         }
     });
+
 
     $(document).on("click", "#addNewAddress", function () {
         let street1 = $('#newAddressStreet1').val();
@@ -108,31 +105,39 @@ $(function () {
         $(this).parent().remove();
     });
 
-    $(document).on("click", "#emailList .emailListItem", function () {
-        let email = $(this).data("email");
+    $(document).on("click", "#emailList .emailListItem .setPrimary", function () {
+        let emailListItem = $(this).closest(".emailListItem");
+        let email = emailListItem.data("email");
         let contactId = $("#contactId").val();
-
         $.ajax({
             type: "POST",
             url: "/Contacts/UpdatePrimaryEmail",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({ contactId: contactId, email: email }),
             success: function () {
+                // Reset all primary indicators and delete buttons to non-primary state
                 $("#emailList .emailListItem").each(function () {
-                    let currentEmail = $(this).data("email");
-                    let primaryIndicator = $(this).find(".primary-indicator");
-                    if (currentEmail === email) {
-                        primaryIndicator.html('<span class="badge badge-success">Yes</span>').addClass("badge badge-success");
-                    } else {
-                        primaryIndicator.html('<span>No</span>').removeClass("badge badge-success");
-                    }
+                    $(this).find(".primary-indicator").removeClass("badge badge-success").html('<a class="pointer setPrimary primary-indicator">Set Primary</a>');
+                    $(this).find("a.redText").addClass("removeEmail pointer").html('X');
                 });
+
+                // Update the newly set primary email
+                let newPrimaryEmail = $("#emailList .emailListItem").filter(function () {
+                    return $(this).data("email") === email;
+                });
+                newPrimaryEmail.find(".primary-indicator").addClass("badge badge-success").html('Primary');
+                newPrimaryEmail.find("a.redText").removeClass("removeEmail pointer").html('');
             },
             error: function () {
                 // Handle error
             }
         });
     });
+
+
+
+
+
 
     $(document).on("click", "#saveContactButton", function () {
         function getEmailAddresses() {
