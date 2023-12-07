@@ -76,25 +76,25 @@ $(function () {
             addressTypeClass = "badge-success"; //green badge
         }
 
-        //if (validateAddress(address)) {
-        $("#addressList").append(
-            '<li class="list-group-item addressListItem" data-street1="' + street1 + '" data-street2="' + street2 + '" data-city="' +
-            city + '" data-state="' + state + '" data-zip="' + zip + '" data-type="' + addressType + '">' +
-            '<span class="badge ' + addressTypeClass + ' m-l-10">' + addressType + '</span>' +
-            '<span class="m-l-20">' + address + ' </span>' +
-            '<a class="redText pointer float-right removeAddress" title="Delete Address">X</a>' +
-            '</li>');
+        if (validateAddress(street1, city, state, zip)) {
+            $("#addressList").append(
+                '<li class="list-group-item addressListItem" data-street1="' + street1 + '" data-street2="' + street2 + '" data-city="' +
+                city + '" data-state="' + state + '" data-zip="' + zip + '" data-type="' + addressType + '">' +
+                '<span class="badge ' + addressTypeClass + ' m-l-10">' + addressType + '</span>' +
+                '<span class="m-l-20">' + address + ' </span>' +
+                '<a class="redText pointer float-right removeAddress" title="Delete Address">X</a>' +
+                '</li>');
 
-        $('#newAddressStreet1').val("");
-        $('#newAddressStreet2').val("");
-        $('#newAddressCity').val("");
-        $('#newAddressState').val("");
-        $('#newAddressZip').val("");
+            $('#newAddressStreet1').val("");
+            $('#newAddressStreet2').val("");
+            $('#newAddressCity').val("");
+            $('#newAddressState').val("");
+            $('#newAddressZip').val("");
 
-        //$('.addressInput').removeClass("invalidInput");
+            $('.addressInput').removeClass("invalidInput");
 
-        //$('.addressFeedback').hide();
-        //} 
+            $('.addressFeedback').hide();
+        }
     });
 
     $(document).on("click", ".removeEmail", function () {
@@ -320,6 +320,48 @@ $(function () {
         } else {
             return false;
         }
+    }
+
+    function validateAddress(street1, city, state, zip) {
+        let isValid = true;
+
+        if (!street1.trim()) {
+            $('#newAddressStreet1').addClass("invalidInput");
+            $('#invalidAddressStreet1Feedback').show();
+            isValid = false;
+        } else {
+            $('#newAddressStreet1').removeClass("invalidInput");
+            $('#invalidAddressStreet1Feedback').hide();
+        }
+
+        if (!city.trim()) {
+            $('#newAddressCity').addClass("invalidInput");
+            $('#invalidAddressCityFeedback').show();
+            isValid = false;
+        } else {
+            $('#newAddressCity').removeClass("invalidInput");
+            $('#invalidAddressCityFeedback').hide();
+        }
+
+        if (!state.trim()) {
+            $('#newAddressState').addClass("invalidInput");
+            $('#invalidAddressStateFeedback').show();
+            isValid = false;
+        } else {
+            $('#newAddressState').removeClass("invalidInput");
+            $('#invalidAddressStateFeedback').hide();
+        }
+
+        if (!zip.trim()) {
+            $('#newAddressZip').addClass("invalidInput");
+            $('#invalidAddressZipFeedback').show();
+            isValid = false;
+        } else {
+            $('#newAddressZip').removeClass("invalidInput");
+            $('#invalidAddressZipFeedback').hide();
+        }
+
+        return isValid;
     }
 
     function initSignalr() {
